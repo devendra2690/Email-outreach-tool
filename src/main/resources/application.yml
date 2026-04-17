@@ -1,0 +1,33 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/dmot}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+app:
+  serpapi:
+    # Set SERPAPI_KEY env variable — get a key at https://serpapi.com
+    key: ${SERPAPI_KEY:}
+  smtp:
+    # Socket + read timeout in milliseconds for SMTP handshake
+    timeout-ms: ${SMTP_TIMEOUT_MS:10000}
+    # EHLO domain sent to mail servers during verification
+    helo-domain: ${SMTP_HELO_DOMAIN:verification.local}
+  hunter:
+    # Optional Hunter.io key for domain pattern detection (free tier: 25 req/month)
+    key: ${HUNTER_API_KEY:}
+
+logging:
+  level:
+    com.dmot: INFO
