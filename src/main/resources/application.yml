@@ -16,6 +16,11 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
 app:
+  security:
+    # Bootstrap master key — set via MASTER_API_KEY env var.
+    # Always valid; use it to create the first DB-backed key via POST /api/v1/keys.
+    # Unset this (or leave blank) once you have created a personal key.
+    master-key: ${MASTER_API_KEY:}
   serpapi:
     # Set SERPAPI_KEY env variable — get a key at https://serpapi.com
     key: ${SERPAPI_KEY:}
