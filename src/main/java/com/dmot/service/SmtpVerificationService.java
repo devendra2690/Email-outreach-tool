@@ -40,8 +40,26 @@ public class SmtpVerificationService {
     @Value("${app.smtp.helo-domain:verification.local}")
     private String heloDomain;
 
+    private final ProviderEmailVerificationService providerVerifier;
+
+    public SmtpVerificationService(ProviderEmailVerificationService providerVerifier) {
+        this.providerVerifier = providerVerifier;
+    }
+
     /** In-process cache so each domain's catch-all status is probed only once per JVM lifetime. */
     private final Map<String, Boolean> catchAllCache = new ConcurrentHashMap<>();
+
+    private static final Set<String> MICROSOFT_MX_SUFFIXES = Set.of(
+            "mail.protection.outlook.com",
+            "outlook.com",
+            "hotmail.com"
+    );
+
+    private static final Set<String> GOOGLE_MX_SUFFIXES = Set.of(
+            "aspmx.l.google.com",
+            "googlemail.com",
+            "smtp.google.com"
+    );
 
     // -------------------------------------------------------------------------
     // Public API
@@ -54,7 +72,7 @@ public class SmtpVerificationService {
      */
     public String getMxRecord(String domain) {
         try {
-            Record[] records = new Lookup(domain, Type.MX).run();
+            org.xbill.DNS.Record[] records = new Lookup(domain, Type.MX).run();
             if (records == null || records.length == 0) {
                 log.debug("No MX records for domain {}", domain);
                 return null;
@@ -92,6 +110,8 @@ public class SmtpVerificationService {
         if (mx == null) {
             return result(email, VerificationStatus.INVALID, "No MX record found for " + domain, false, null);
         }
+        if (isMicrosoft(mx)) return checkViaProvider(email, mx, false);
+        if (isGoogle(mx))    return checkViaProvider(email, mx, true);
         boolean catchAll = isCatchAll(domain);
         EmailVerificationResult raw = smtpCheck(email, mx);
         return finalize(raw, catchAll, mx);
@@ -115,6 +135,15 @@ public class SmtpVerificationService {
                     .toList();
         }
 
+        if (isMicrosoft(mx)) {
+            log.info("Using Microsoft API verification for {} (MX: {})", domain, mx);
+            return emails.stream().map(e -> checkViaProvider(e, mx, false)).toList();
+        }
+        if (isGoogle(mx)) {
+            log.info("Using Google API verification for {} (MX: {})", domain, mx);
+            return emails.stream().map(e -> checkViaProvider(e, mx, true)).toList();
+        }
+
         boolean catchAll = isCatchAll(domain);
 
         return emails.stream()
@@ -127,8 +156,19 @@ public class SmtpVerificationService {
     // -------------------------------------------------------------------------
 
     private EmailVerificationResult smtpCheck(String email, String mxHost) {
+        // Try port 25 first, fall back to port 587 (submission) if it times out
+        EmailVerificationResult result = smtpCheckOnPort(email, mxHost, 25);
+        if (result.getStatus() == VerificationStatus.TIMEOUT) {
+            log.debug("Port 25 timed out for {}, retrying on port 587", mxHost);
+            EmailVerificationResult fallback = smtpCheckOnPort(email, mxHost, 587);
+            if (fallback.getStatus() != VerificationStatus.TIMEOUT) return fallback;
+        }
+        return result;
+    }
+
+    private EmailVerificationResult smtpCheckOnPort(String email, String mxHost, int port) {
         try (Socket socket = new Socket()) {
-            socket.connect(new InetSocketAddress(mxHost, 25), timeoutMs);
+            socket.connect(new InetSocketAddress(mxHost, port), timeoutMs);
             socket.setSoTimeout(timeoutMs);
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -217,6 +257,35 @@ public class SmtpVerificationService {
         } catch (NumberFormatException | StringIndexOutOfBoundsException e) {
             return 400;
         }
+    }
+
+    private boolean isMicrosoft(String mxHost) {
+        String lower = mxHost.toLowerCase();
+        return MICROSOFT_MX_SUFFIXES.stream().anyMatch(lower::endsWith);
+    }
+
+    private boolean isGoogle(String mxHost) {
+        String lower = mxHost.toLowerCase();
+        return GOOGLE_MX_SUFFIXES.stream().anyMatch(lower::endsWith);
+    }
+
+    private EmailVerificationResult checkViaProvider(String email, String mx, boolean google) {
+        ProviderEmailVerificationService.ProviderResult pr = google
+                ? providerVerifier.checkGoogle(email)
+                : providerVerifier.checkMicrosoft(email);
+
+        VerificationStatus status = switch (pr) {
+            case EXISTS     -> VerificationStatus.VALID;
+            case NOT_EXISTS -> VerificationStatus.INVALID;
+            case UNKNOWN    -> VerificationStatus.UNVERIFIABLE;
+        };
+        String provider = google ? "Google Workspace" : "Microsoft 365";
+        String detail = switch (pr) {
+            case EXISTS     -> "Confirmed via " + provider + " login API";
+            case NOT_EXISTS -> "Account not found in " + provider + " directory";
+            case UNKNOWN    -> provider + " check inconclusive (federated/hybrid tenant)";
+        };
+        return result(email, status, detail, false, mx);
     }
 
     private String domainOf(String email) {

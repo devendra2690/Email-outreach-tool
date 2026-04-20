@@ -25,6 +25,7 @@ public class EmailPatternService {
     public List<String> generatePatterns(String firstName, String lastName, String domain) {
         String f  = firstName.toLowerCase().trim();
         String l  = lastName.toLowerCase().trim();
+        domain    = domain.toLowerCase().trim();
         String fi = String.valueOf(f.charAt(0));  // first initial
         String li = String.valueOf(l.charAt(0));  // last initial
 

@@ -17,4 +17,6 @@ public class DecisionMakerInfo {
     private String company;
     private String domain;
     private String sourceUrl;
+    /** Email found directly in a LinkedIn post/snippet — already confirmed, skip pattern generation. */
+    private String knownEmail;
 }

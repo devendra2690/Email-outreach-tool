@@ -20,6 +20,8 @@ public class EmailVerificationResult {
     public enum VerificationStatus {
         /** SMTP RCPT TO returned 250 and domain is not catch-all */
         VALID,
+        /** Found directly on the company's own website — ground-truth valid */
+        WEBSITE,
         /** SMTP returned 5xx permanent rejection */
         INVALID,
         /** Domain accepts all addresses (catch-all server) */

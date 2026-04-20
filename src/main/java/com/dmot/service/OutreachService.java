@@ -27,14 +27,19 @@ import java.util.List;
 @RequiredArgsConstructor
 public class OutreachService {
 
-    private final LeadIdentificationService leadService;
-    private final EmailPatternService       patternService;
-    private final SmtpVerificationService   smtpService;
-    private final LeadRepository            leadRepository;
-    private final DomainCacheRepository     domainCacheRepository;
+    private final LeadIdentificationService    leadService;
+    private final EmailPatternService          patternService;
+    private final SmtpVerificationService      smtpService;
+    private final EmailDomainDetectionService  detectionService;
+    private final LeadRepository               leadRepository;
+    private final DomainCacheRepository        domainCacheRepository;
 
     public OutreachResponse processOutreach(OutreachRequest request) {
         String domain = request.getDomain();
+        // Use emailDomain override if provided (e.g. website=chhedaspecialities.com, email=chhedas.com)
+        String emailDomain = (request.getEmailDomain() != null && !request.getEmailDomain().isBlank())
+                ? request.getEmailDomain()
+                : domain;
 
         if (!request.isSkipCache()) {
             List<Lead> cached = leadRepository.findByDomain(domain);
@@ -58,16 +63,62 @@ public class OutreachService {
 
         // Phase 2: generate patterns for the top-ranked decision-maker
         DecisionMakerInfo primary = decisionMakers.get(0);
-        List<String> patterns = patternService.generatePatterns(
-                primary.getFirstName(), primary.getLastName(), domain
-        );
-        log.info("Generated {} email patterns for {} at {}", patterns.size(), primary.getFullName(), domain);
 
-        // Phase 3
-        List<EmailVerificationResult> results = smtpService.verifyAll(patterns);
+        // If the email was found directly in a LinkedIn post, skip pattern generation entirely
+        if (primary.getKnownEmail() != null && !primary.getKnownEmail().isBlank()) {
+            log.info("Known email found for {} via LinkedIn post: {}", primary.getFullName(), primary.getKnownEmail());
+            EmailVerificationResult known = EmailVerificationResult.builder()
+                    .email(primary.getKnownEmail())
+                    .status(VerificationStatus.WEBSITE)
+                    .smtpResponse("Email found directly in LinkedIn post — ground-truth valid")
+                    .build();
+            persistLead(primary, primary.getKnownEmail());
+            return OutreachResponse.builder()
+                    .domain(domain)
+                    .decisionMakers(decisionMakers)
+                    .verifiedEmails(List.of(known))
+                    .bestEmail(primary.getKnownEmail())
+                    .catchAllDomain(false)
+                    .build();
+        }
+
+        List<String> patterns = patternService.generatePatterns(
+                primary.getFirstName(), primary.getLastName(), emailDomain
+        );
+        log.info("Generated {} email patterns for {} at {}", patterns.size(), primary.getFullName(), emailDomain);
+
+        // Phase 2b: scrape the website for published emails — ground-truth valid
+        EmailDomainDetectionService.WebsiteEmails websiteEmails =
+                detectionService.scrapeWebsiteEmails(domain);
+        java.util.Set<String> websiteEmailSet = new java.util.HashSet<>(websiteEmails.emails());
+
+        // Phase 3: verify patterns; skip SMTP for any email found on the website
+        List<EmailVerificationResult> smtpResults = smtpService.verifyAll(patterns);
+        List<EmailVerificationResult> results = smtpResults.stream()
+                .map(r -> websiteEmailSet.contains(r.getEmail())
+                        ? EmailVerificationResult.builder()
+                            .email(r.getEmail())
+                            .status(VerificationStatus.WEBSITE)
+                            .smtpResponse("Found on company website — ground-truth valid")
+                            .mxRecord(r.getMxRecord())
+                            .build()
+                        : r)
+                .collect(java.util.stream.Collectors.toList());
+
+        // Also add website emails that weren't in the generated patterns
+        websiteEmails.emails().stream()
+                .filter(e -> patterns.stream().noneMatch(p -> p.equalsIgnoreCase(e)))
+                .map(e -> EmailVerificationResult.builder()
+                        .email(e)
+                        .status(VerificationStatus.WEBSITE)
+                        .smtpResponse("Found on company website — ground-truth valid")
+                        .build())
+                .forEach(r -> results.add(0, r)); // prepend — highest confidence
+
         boolean catchAll = results.stream().anyMatch(EmailVerificationResult::isCatchAll);
         String bestEmail = results.stream()
-                .filter(r -> r.getStatus() == VerificationStatus.VALID)
+                .filter(r -> r.getStatus() == VerificationStatus.WEBSITE
+                          || r.getStatus() == VerificationStatus.VALID)
                 .map(EmailVerificationResult::getEmail)
                 .findFirst()
                 .orElse(null);

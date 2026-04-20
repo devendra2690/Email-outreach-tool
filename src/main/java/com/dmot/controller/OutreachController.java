@@ -1,6 +1,7 @@
 package com.dmot.controller;
 
 import com.dmot.model.*;
+import com.dmot.service.EmailDomainDetectionService;
 import com.dmot.service.EmailPatternService;
 import com.dmot.service.OutreachService;
 import com.dmot.service.SmtpVerificationService;
@@ -25,9 +26,10 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class OutreachController {
 
-    private final OutreachService         outreachService;
-    private final EmailPatternService     patternService;
+    private final OutreachService outreachService;
+    private final EmailPatternService  patternService;
     private final SmtpVerificationService smtpService;
+    private final EmailDomainDetectionService domainDetectionService;
 
     /**
      * Run the full 3-phase outreach pipeline for a target domain.
@@ -67,7 +69,23 @@ public class OutreachController {
     @PostMapping("/verify-email")
     public ResponseEntity<EmailVerificationResult> verifyEmail(@RequestBody Map<String, String> body) {
         String email = requireParam(body, "email");
-        return ResponseEntity.ok(smtpService.verifySingle(email));
+        EmailVerificationResult result = smtpService.verifySingle(email);
+        // SMTP couldn't verify — check if the email is published on the company's own website
+        if (result.getStatus() == EmailVerificationResult.VerificationStatus.UNVERIFIABLE
+                || result.getStatus() == EmailVerificationResult.VerificationStatus.TIMEOUT) {
+            String domain = email.substring(email.indexOf('@') + 1);
+            EmailDomainDetectionService.WebsiteEmails websiteEmails =
+                    domainDetectionService.scrapeWebsiteEmails(domain);
+            if (websiteEmails.emails().stream().anyMatch(e -> e.equalsIgnoreCase(email))) {
+                result = EmailVerificationResult.builder()
+                        .email(email)
+                        .status(EmailVerificationResult.VerificationStatus.WEBSITE)
+                        .smtpResponse("Found on company website — ground-truth valid")
+                        .mxRecord(result.getMxRecord())
+                        .build();
+            }
+        }
+        return ResponseEntity.ok(result);
     }
 
     /**
@@ -82,7 +100,48 @@ public class OutreachController {
         if (emails == null || emails.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.ok(smtpService.verifyAll(emails));
+        List<EmailVerificationResult> results = smtpService.verifyAll(emails);
+
+        // Scrape the website once for the shared domain, upgrade any matches to WEBSITE status
+        String sharedDomain = emails.get(0).substring(emails.get(0).indexOf('@') + 1);
+        EmailDomainDetectionService.WebsiteEmails websiteEmails =
+                domainDetectionService.scrapeWebsiteEmails(sharedDomain);
+        java.util.Set<String> onWebsite = new java.util.HashSet<>(websiteEmails.emails());
+
+        results = results.stream().map(r -> {
+            if (onWebsite.contains(r.getEmail().toLowerCase()) &&
+                    (r.getStatus() == EmailVerificationResult.VerificationStatus.UNVERIFIABLE
+                  || r.getStatus() == EmailVerificationResult.VerificationStatus.TIMEOUT)) {
+                return EmailVerificationResult.builder()
+                        .email(r.getEmail())
+                        .status(EmailVerificationResult.VerificationStatus.WEBSITE)
+                        .smtpResponse("Found on company website — ground-truth valid")
+                        .mxRecord(r.getMxRecord())
+                        .build();
+            }
+            return r;
+        }).toList();
+
+        return ResponseEntity.ok(results);
+    }
+
+    /**
+     * Detect the likely email domain for a given website domain.
+     * Uses MX record analysis and optionally Hunter.io.
+     *
+     * Query param: domain=chhedaspecialities.com
+     */
+    @GetMapping("/detect-email-domain")
+    public ResponseEntity<Map<String, String>> detectEmailDomain(@RequestParam String domain) {
+        if (domain == null || domain.isBlank()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "domain parameter is required"));
+        }
+        EmailDomainDetectionService.DetectionResult result = domainDetectionService.detect(domain.trim());
+        return ResponseEntity.ok(Map.of(
+                "emailDomain", result.emailDomain(),
+                "source",      result.source(),
+                "detail",      result.detail()
+        ));
     }
 
     // -------------------------------------------------------------------------
