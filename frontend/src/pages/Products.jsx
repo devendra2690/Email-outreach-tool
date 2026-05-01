@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import { Search, SlidersHorizontal, X } from 'lucide-react'
-import { products, CATEGORIES } from '../data/products'
+import { CATEGORIES } from '../data/products'
+import { useApp } from '../context/AppContext'
 import ProductCard from '../components/ProductCard'
 
 const SORT_OPTIONS = [
@@ -12,6 +13,7 @@ const SORT_OPTIONS = [
 ]
 
 export default function Products() {
+  const { products } = useApp()
   const [category, setCategory] = useState('All')
   const [search, setSearch] = useState('')
   const [sort, setSort] = useState('featured')

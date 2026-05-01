@@ -1,7 +1,6 @@
 import { ArrowRight, Truck, RotateCcw, Shield, Headphones, Star } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import ProductCard from '../components/ProductCard'
-import { products } from '../data/products'
 
 const CATEGORIES = [
   { label: "Men's", desc: 'Shirts, Pants, Blazers & more', colorFrom: '#475569', colorTo: '#1e3a5f', emoji: '👔' },
@@ -38,10 +37,9 @@ const TESTIMONIALS = [
   },
 ]
 
-const featured = products.filter(p => p.badge === 'Bestseller' || p.badge === 'New Arrival').slice(0, 4)
-
 export default function Home() {
-  const { navigate } = useApp()
+  const { navigate, products } = useApp()
+  const featured = products.filter(p => p.badge === 'Bestseller' || p.badge === 'New Arrival').slice(0, 4)
 
   return (
     <div>

@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Star, ShoppingBag, ArrowLeft, Truck, RotateCcw, Shield } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 import ProductCard from '../components/ProductCard'
-import { products } from '../data/products'
 
 function ProductImage({ product }) {
   return (
@@ -26,7 +25,7 @@ function ProductImage({ product }) {
 }
 
 export default function ProductDetail() {
-  const { selectedProduct: product, navigate, addToCart } = useApp()
+  const { selectedProduct: product, navigate, addToCart, products } = useApp()
   const [selectedSize, setSelectedSize] = useState(null)
   const [selectedColor, setSelectedColor] = useState(null)
   const [qty, setQty] = useState(1)

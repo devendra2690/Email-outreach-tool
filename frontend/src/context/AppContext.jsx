@@ -1,6 +1,23 @@
-import { createContext, useContext, useReducer, useState } from 'react'
+import { createContext, useContext, useReducer, useState, useEffect } from 'react'
+import { products as defaultProducts } from '../data/products'
 
 const AppContext = createContext(null)
+
+const STORAGE_KEY = 'pravin_fashion_products'
+const ADMIN_PASSWORD = 'pravin@2024'
+
+function loadProducts() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY)
+    return saved ? JSON.parse(saved) : defaultProducts
+  } catch {
+    return defaultProducts
+  }
+}
+
+function saveProducts(products) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(products))
+}
 
 function cartReducer(state, action) {
   switch (action.type) {
@@ -28,12 +45,35 @@ export function AppProvider({ children }) {
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [order, setOrder] = useState(null)
   const [cart, dispatch] = useReducer(cartReducer, [])
+  const [products, setProducts] = useState(loadProducts)
+  const [isAdmin, setIsAdmin] = useState(false)
+
+  useEffect(() => { saveProducts(products) }, [products])
 
   const navigate = (newPage, data = null) => {
     if (newPage === 'product-detail') setSelectedProduct(data)
     if (newPage === 'order-success') setOrder(data)
     setPage(newPage)
     window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const adminLogin = (password) => {
+    if (password === ADMIN_PASSWORD) { setIsAdmin(true); return true }
+    return false
+  }
+  const adminLogout = () => setIsAdmin(false)
+
+  const addProduct = (product) => {
+    const id = Date.now()
+    setProducts(prev => [...prev, { ...product, id }])
+  }
+
+  const updateProduct = (id, updated) => {
+    setProducts(prev => prev.map(p => p.id === id ? { ...p, ...updated } : p))
+  }
+
+  const deleteProduct = (id) => {
+    setProducts(prev => prev.filter(p => p.id !== id))
   }
 
   const addToCart = (product, size, color, qty = 1) =>
@@ -51,8 +91,11 @@ export function AppProvider({ children }) {
       page, navigate,
       selectedProduct,
       order,
+      products,
       cart, cartCount, cartTotal,
       addToCart, removeFromCart, updateQty, clearCart,
+      isAdmin, adminLogin, adminLogout,
+      addProduct, updateProduct, deleteProduct,
     }}>
       {children}
     </AppContext.Provider>

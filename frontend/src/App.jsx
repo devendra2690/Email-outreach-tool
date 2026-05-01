@@ -7,29 +7,32 @@ import ProductDetail from './pages/ProductDetail'
 import Cart from './pages/Cart'
 import Checkout from './pages/Checkout'
 import OrderSuccess from './pages/OrderSuccess'
+import Admin from './pages/Admin'
 
 function PageRenderer() {
   const { page } = useApp()
-  switch (page) {
-    case 'home':           return <Home />
-    case 'products':       return <Products />
-    case 'product-detail': return <ProductDetail />
-    case 'cart':           return <Cart />
-    case 'checkout':       return <Checkout />
-    case 'order-success':  return <OrderSuccess />
-    default:               return <Home />
-  }
+  if (page === 'admin') return <Admin />
+  return (
+    <>
+      <Navbar />
+      <main className="flex-1">
+        {page === 'home'           && <Home />}
+        {page === 'products'       && <Products />}
+        {page === 'product-detail' && <ProductDetail />}
+        {page === 'cart'           && <Cart />}
+        {page === 'checkout'       && <Checkout />}
+        {page === 'order-success'  && <OrderSuccess />}
+      </main>
+      <Footer />
+    </>
+  )
 }
 
 export default function App() {
   return (
     <AppProvider>
       <div className="min-h-screen flex flex-col bg-white">
-        <Navbar />
-        <main className="flex-1">
-          <PageRenderer />
-        </main>
-        <Footer />
+        <PageRenderer />
       </div>
     </AppProvider>
   )
