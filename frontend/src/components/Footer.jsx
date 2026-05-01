@@ -1,4 +1,4 @@
-import { Shirt, Mail, Phone, MapPin } from 'lucide-react'
+import { Phone, MapPin } from 'lucide-react'
 import { useApp } from '../context/AppContext'
 
 export default function Footer() {
@@ -9,11 +9,8 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center">
-                <Shirt className="w-4 h-4 text-white" />
-              </div>
-              <span className="text-white font-bold text-lg">Pravin Fashion</span>
+            <div className="mb-4">
+              <img src="/logo.png" alt="Pravin Fashion" className="h-16 w-auto object-contain brightness-0 invert" />
             </div>
             <p className="text-sm text-gray-400 leading-relaxed mb-4">
               Your destination for premium quality garments in Silvassa. We offer the finest in men's,
