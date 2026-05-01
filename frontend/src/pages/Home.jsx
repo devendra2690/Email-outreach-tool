@@ -18,19 +18,19 @@ const FEATURES = [
 
 const TESTIMONIALS = [
   {
-    name: 'Sarah M.',
+    name: 'Priya S.',
     review: 'The quality of the fabrics is exceptional. My floral wrap dress gets compliments every time I wear it!',
     rating: 5,
     product: 'Floral Wrap Dress',
   },
   {
-    name: 'James R.',
+    name: 'Rahul M.',
     review: 'Best fitting chinos I\'ve ever owned. The stretch fabric makes them incredibly comfortable for all-day wear.',
     rating: 5,
     product: 'Slim Fit Chinos',
   },
   {
-    name: 'Emily K.',
+    name: 'Ananya K.',
     review: 'My kids love the fun print t-shirts! Great quality and they hold up well to multiple washes.',
     rating: 5,
     product: 'Fun Print T-Shirt Set',
