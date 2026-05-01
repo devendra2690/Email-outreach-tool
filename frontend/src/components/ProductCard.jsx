@@ -71,12 +71,17 @@ export default function ProductCard({ product }) {
           <span className="text-xs text-gray-500">({product.reviews})</span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <span className="text-gray-900 font-bold">₹{product.price.toLocaleString('en-IN')}</span>
           {product.originalPrice && (
-            <span className="text-gray-400 text-sm line-through">
-              ₹{product.originalPrice.toLocaleString('en-IN')}
-            </span>
+            <>
+              <span className="text-gray-400 text-sm line-through">
+                ₹{product.originalPrice.toLocaleString('en-IN')}
+              </span>
+              <span className="bg-red-100 text-red-600 text-xs font-semibold px-2 py-0.5 rounded-full">
+                {Math.round((1 - product.price / product.originalPrice) * 100)}% OFF
+              </span>
+            </>
           )}
         </div>
       </div>

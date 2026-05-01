@@ -24,7 +24,7 @@ const COLOR_THEMES = [
 ]
 
 const EMPTY_FORM = {
-  name: '', category: "Men's", price: '', originalPrice: '',
+  name: '', category: "Men's", price: '', originalPrice: '', costPrice: '',
   description: '', care: '', sizes: '', colors: '',
   badge: '', colorFrom: '#475569', colorTo: '#1e3a5f',
 }
@@ -100,6 +100,7 @@ function ProductForm({ initial, onSave, onCancel }) {
       ...form,
       price: Number(form.price),
       originalPrice: form.originalPrice ? Number(form.originalPrice) : null,
+      costPrice: form.costPrice ? Number(form.costPrice) : null,
       sizes: form.sizes.split(',').map(s => s.trim()).filter(Boolean),
       colors: form.colors.split(',').map(s => s.trim()).filter(Boolean),
       badge: form.badge || null,
@@ -159,7 +160,7 @@ function ProductForm({ initial, onSave, onCancel }) {
           {/* Price */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Price (₹) *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Selling Price (₹) *</label>
               <input
                 type="number"
                 value={form.price}
@@ -167,10 +168,11 @@ function ProductForm({ initial, onSave, onCancel }) {
                 placeholder="e.g. 1499"
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
               />
+              <p className="text-xs text-gray-400 mt-1">Price customers pay</p>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Original Price (₹) <span className="text-gray-400 font-normal">— for Sale badge</span>
+                MRP / Original Price (₹)
               </label>
               <input
                 type="number"
@@ -179,6 +181,47 @@ function ProductForm({ initial, onSave, onCancel }) {
                 placeholder="e.g. 1999 (optional)"
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
               />
+              <p className="text-xs text-gray-400 mt-1">Shown as strikethrough + % OFF</p>
+            </div>
+          </div>
+
+          {/* Cost Price + Discount Preview */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Cost Price (₹) <span className="text-gray-400 font-normal">— your purchase price</span>
+              </label>
+              <input
+                type="number"
+                value={form.costPrice}
+                onChange={e => set('costPrice', e.target.value)}
+                placeholder="e.g. 800 (private)"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              />
+              <p className="text-xs text-gray-400 mt-1">Only you can see this — never shown to customers</p>
+            </div>
+            <div className="flex flex-col justify-center">
+              {form.price && form.originalPrice && Number(form.originalPrice) > Number(form.price) ? (
+                <div className="bg-green-50 border border-green-200 rounded-xl p-3">
+                  <p className="text-xs text-green-700 font-medium mb-1">Customers will see:</p>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-bold text-gray-900">₹{Number(form.price).toLocaleString('en-IN')}</span>
+                    <span className="text-gray-400 text-sm line-through">₹{Number(form.originalPrice).toLocaleString('en-IN')}</span>
+                    <span className="bg-red-100 text-red-600 text-xs font-bold px-2 py-0.5 rounded-full">
+                      {Math.round((1 - Number(form.price) / Number(form.originalPrice)) * 100)}% OFF
+                    </span>
+                  </div>
+                  {form.costPrice && Number(form.costPrice) > 0 && (
+                    <p className="text-xs text-green-600 mt-1.5">
+                      Your profit: ₹{(Number(form.price) - Number(form.costPrice)).toLocaleString('en-IN')} per piece
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <div className="bg-gray-50 border border-dashed border-gray-200 rounded-xl p-3 text-center">
+                  <p className="text-xs text-gray-400">Enter Selling Price + MRP above to see the discount preview</p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -349,10 +392,20 @@ export default function Admin() {
                   <span className="text-sm text-gray-500">{product.category}</span>
                 </td>
                 <td className="px-6 py-4">
-                  <div>
-                    <span className="text-sm font-semibold text-gray-900">₹{product.price.toLocaleString('en-IN')}</span>
-                    {product.originalPrice && (
-                      <span className="text-xs text-gray-400 line-through ml-1">₹{product.originalPrice.toLocaleString('en-IN')}</span>
+                  <div className="flex flex-col gap-0.5">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-sm font-semibold text-gray-900">₹{product.price.toLocaleString('en-IN')}</span>
+                      {product.originalPrice && (
+                        <>
+                          <span className="text-xs text-gray-400 line-through">₹{product.originalPrice.toLocaleString('en-IN')}</span>
+                          <span className="bg-red-100 text-red-600 text-xs font-semibold px-1.5 py-0.5 rounded-full">
+                            {Math.round((1 - product.price / product.originalPrice) * 100)}% OFF
+                          </span>
+                        </>
+                      )}
+                    </div>
+                    {product.costPrice && (
+                      <span className="text-xs text-gray-400">Cost: ₹{product.costPrice.toLocaleString('en-IN')}</span>
                     )}
                   </div>
                 </td>
@@ -374,6 +427,7 @@ export default function Admin() {
                         colors: product.colors.join(', '),
                         badge: product.badge || '',
                         originalPrice: product.originalPrice || '',
+                        costPrice: product.costPrice || '',
                       })}
                       className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
                       title="Edit"
