@@ -10,7 +10,8 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="col-span-1 md:col-span-2">
             <div className="mb-4">
-              <img src="/logo.png" alt="Pravin Fashion" className="h-16 w-auto object-contain brightness-0 invert" />
+              <p className="text-white text-2xl font-bold tracking-wide">Pravin Fashion</p>
+              <p className="text-indigo-400 text-sm">Premium Garments · Silvassa</p>
             </div>
             <p className="text-sm text-gray-400 leading-relaxed mb-4">
               Your destination for premium quality garments in Silvassa. We offer the finest in men's,
