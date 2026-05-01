@@ -5,8 +5,8 @@ export const products = [
     id: 1,
     name: 'Classic Oxford Shirt',
     category: "Men's",
-    price: 49.99,
-    originalPrice: 69.99,
+    price: 2499,
+    originalPrice: 3499,
     description:
       'A timeless Oxford shirt crafted from 100% premium cotton. Perfect for both casual and formal occasions. Features a button-down collar and a relaxed fit that pairs well with chinos or jeans.',
     care: 'Machine wash cold. Tumble dry low. Iron on medium heat.',
@@ -22,7 +22,7 @@ export const products = [
     id: 2,
     name: 'Slim Fit Chinos',
     category: "Men's",
-    price: 59.99,
+    price: 2999,
     originalPrice: null,
     description:
       'Modern slim fit chinos made from a comfortable stretch fabric blend. Versatile enough for the office or weekend wear. Available in multiple earthy tones.',
@@ -39,8 +39,8 @@ export const products = [
     id: 3,
     name: 'Premium Zip Hoodie',
     category: "Men's",
-    price: 79.99,
-    originalPrice: 99.99,
+    price: 3999,
+    originalPrice: 4999,
     description:
       'Ultra-soft fleece hoodie with a full-length zip. Features kangaroo pockets, ribbed cuffs, and an adjustable drawstring hood. Perfect for layering in cooler weather.',
     care: 'Machine wash cold. Tumble dry low.',
@@ -56,7 +56,7 @@ export const products = [
     id: 4,
     name: 'Classic Wool Blazer',
     category: "Men's",
-    price: 149.99,
+    price: 7499,
     originalPrice: null,
     description:
       'A sophisticated wool-blend blazer with a two-button closure and notched lapels. Tailored for a sharp, structured silhouette. Ideal for professional and semi-formal settings.',
@@ -73,8 +73,8 @@ export const products = [
     id: 5,
     name: 'Floral Wrap Dress',
     category: "Women's",
-    price: 89.99,
-    originalPrice: 119.99,
+    price: 4499,
+    originalPrice: 5999,
     description:
       'An elegant floral wrap dress made from lightweight chiffon. The adjustable tie waist flatters all body types. Perfect for garden parties, brunches, or casual date nights.',
     care: 'Hand wash cold. Lay flat to dry.',
@@ -90,7 +90,7 @@ export const products = [
     id: 6,
     name: 'High-Rise Skinny Jeans',
     category: "Women's",
-    price: 69.99,
+    price: 3499,
     originalPrice: null,
     description:
       'Flattering high-rise skinny jeans crafted from premium denim with 2% elastane for comfort and stretch. Features five-pocket styling and a zip-fly closure.',
@@ -107,8 +107,8 @@ export const products = [
     id: 7,
     name: 'Cashmere Blend Sweater',
     category: "Women's",
-    price: 109.99,
-    originalPrice: 149.99,
+    price: 5499,
+    originalPrice: 7499,
     description:
       'A luxuriously soft cashmere-blend crew neck sweater. Features a relaxed silhouette with ribbed trims. A wardrobe essential that transitions effortlessly from season to season.',
     care: 'Hand wash cold or dry clean. Reshape while damp.',
@@ -124,7 +124,7 @@ export const products = [
     id: 8,
     name: 'Linen Button Blouse',
     category: "Women's",
-    price: 55.99,
+    price: 2799,
     originalPrice: null,
     description:
       'A breezy linen button-up blouse with a relaxed fit. Features a V-neckline, roll-up sleeves, and a slightly curved hem. Ideal for warm-weather dressing.',
@@ -141,7 +141,7 @@ export const products = [
     id: 9,
     name: 'Pleated Midi Skirt',
     category: "Women's",
-    price: 64.99,
+    price: 3249,
     originalPrice: null,
     description:
       'An elegant pleated midi skirt with a comfortable elastic waistband. The flowing silhouette moves beautifully and pairs well with tucked blouses or fitted tops.',
@@ -158,7 +158,7 @@ export const products = [
     id: 10,
     name: 'Denim Dungarees',
     category: "Kids'",
-    price: 39.99,
+    price: 1999,
     originalPrice: null,
     description:
       'Adorable and durable denim dungarees for active kids. Features adjustable straps, deep pockets, and reinforced knees. Available in classic blue and washed grey.',
@@ -175,8 +175,8 @@ export const products = [
     id: 11,
     name: 'Fun Print T-Shirt Set',
     category: "Kids'",
-    price: 29.99,
-    originalPrice: 39.99,
+    price: 1499,
+    originalPrice: 1999,
     description:
       'A pack of 3 fun graphic t-shirts in breathable 100% cotton. Features playful prints of animals and vehicles that kids love. Pre-shrunk for a lasting fit.',
     care: 'Machine wash warm. Tumble dry low.',
@@ -192,7 +192,7 @@ export const products = [
     id: 12,
     name: 'Cozy Fleece Pajama Set',
     category: "Kids'",
-    price: 34.99,
+    price: 1749,
     originalPrice: null,
     description:
       'Super soft fleece pajama set for cozy bedtime routines. Features an elastic waistband and a snap-front top for easy changes. Available in fun character prints.',
@@ -209,7 +209,7 @@ export const products = [
     id: 13,
     name: 'School Uniform Set',
     category: "Kids'",
-    price: 44.99,
+    price: 2249,
     originalPrice: null,
     description:
       'A complete school uniform set including a polo shirt and straight-leg trousers. Made from durable, easy-care fabric that stays crisp all day.',
@@ -226,7 +226,7 @@ export const products = [
     id: 14,
     name: 'Genuine Leather Belt',
     category: 'Accessories',
-    price: 34.99,
+    price: 1749,
     originalPrice: null,
     description:
       'A classic genuine leather dress belt with a brushed silver buckle. Full-grain leather that ages beautifully over time.',
@@ -243,8 +243,8 @@ export const products = [
     id: 15,
     name: 'Pure Silk Scarf',
     category: 'Accessories',
-    price: 59.99,
-    originalPrice: 79.99,
+    price: 2999,
+    originalPrice: 3999,
     description:
       'A luxurious 100% pure silk scarf with hand-rolled edges. Features vibrant artistic prints inspired by botanical illustrations. Versatile as a headscarf, necktie, or bag accessory.',
     care: 'Dry clean only or gentle hand wash in cold water.',
@@ -260,7 +260,7 @@ export const products = [
     id: 16,
     name: 'Canvas Tote Bag',
     category: 'Accessories',
-    price: 24.99,
+    price: 1249,
     originalPrice: null,
     description:
       'A sturdy and spacious canvas tote bag with reinforced handles and an interior zip pocket. Perfect for shopping, beach days, or everyday errands. Made from eco-friendly materials.',

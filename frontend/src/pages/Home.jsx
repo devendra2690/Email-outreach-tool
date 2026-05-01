@@ -11,7 +11,7 @@ const CATEGORIES = [
 ]
 
 const FEATURES = [
-  { icon: Truck, title: 'Free Shipping', desc: 'On orders over $75' },
+  { icon: Truck, title: 'Free Shipping', desc: 'On orders over ₹5,000' },
   { icon: RotateCcw, title: 'Easy Returns', desc: '30-day return policy' },
   { icon: Shield, title: 'Secure Payment', desc: '100% secure checkout' },
   { icon: Headphones, title: '24/7 Support', desc: 'Here to help anytime' },

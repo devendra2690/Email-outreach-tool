@@ -55,7 +55,7 @@ export default function OrderSuccess() {
                 </p>
               </div>
               <p className="text-sm font-bold text-gray-900">
-                ${(item.product.price * item.qty).toFixed(2)}
+                ₹{(item.product.price * item.qty).toLocaleString('en-IN')}
               </p>
             </div>
           ))}
@@ -64,11 +64,11 @@ export default function OrderSuccess() {
         <div className="border-t border-gray-100 mt-4 pt-4 space-y-1.5 text-sm">
           <div className="flex justify-between text-gray-500">
             <span>Shipping</span>
-            <span>{order.shipping === 0 ? 'FREE' : `$${order.shipping.toFixed(2)}`}</span>
+            <span>{order.shipping === 0 ? 'FREE' : `₹${order.shipping}`}</span>
           </div>
           <div className="flex justify-between font-bold text-gray-900">
             <span>Total</span>
-            <span className="text-indigo-600">${order.total.toFixed(2)}</span>
+            <span className="text-indigo-600">₹{order.total.toLocaleString('en-IN')}</span>
           </div>
         </div>
       </div>

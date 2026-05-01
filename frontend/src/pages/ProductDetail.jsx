@@ -100,11 +100,11 @@ export default function ProductDetail() {
           </div>
 
           <div className="flex items-center gap-3 mb-6">
-            <span className="text-3xl font-bold text-gray-900">${product.price.toFixed(2)}</span>
+            <span className="text-3xl font-bold text-gray-900">₹{product.price.toLocaleString('en-IN')}</span>
             {product.originalPrice && (
               <>
                 <span className="text-gray-400 text-xl line-through">
-                  ${product.originalPrice.toFixed(2)}
+                  ₹{product.originalPrice.toLocaleString('en-IN')}
                 </span>
                 <span className="bg-red-100 text-red-600 text-sm font-semibold px-2.5 py-0.5 rounded-full">
                   {discount}% OFF

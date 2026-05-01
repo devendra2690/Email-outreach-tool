@@ -54,7 +54,7 @@ function CartItem({ item }) {
             </button>
           </div>
           <span className="font-bold text-gray-900">
-            ${(item.product.price * item.qty).toFixed(2)}
+            ₹{(item.product.price * item.qty).toLocaleString('en-IN')}
           </span>
         </div>
       </div>
@@ -64,7 +64,7 @@ function CartItem({ item }) {
 
 export default function Cart() {
   const { cart, cartTotal, navigate } = useApp()
-  const shipping = cartTotal >= 75 ? 0 : 8.99
+  const shipping = cartTotal >= 5000 ? 0 : 99
   const total = cartTotal + shipping
 
   if (cart.length === 0) {
@@ -110,22 +110,22 @@ export default function Cart() {
             <div className="space-y-3 mb-5">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Subtotal</span>
-                <span className="font-medium">${cartTotal.toFixed(2)}</span>
+                <span className="font-medium">₹{cartTotal.toLocaleString('en-IN')}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Shipping</span>
                 <span className={`font-medium ${shipping === 0 ? 'text-green-600' : ''}`}>
-                  {shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`}
+                  {shipping === 0 ? 'FREE' : `₹${shipping}`}
                 </span>
               </div>
               {shipping > 0 && (
                 <p className="text-xs text-indigo-500">
-                  Add ${(75 - cartTotal).toFixed(2)} more for free shipping
+                  Add ₹{(5000 - cartTotal).toLocaleString('en-IN')} more for free shipping
                 </p>
               )}
               <div className="border-t border-gray-100 pt-3 flex justify-between font-bold">
                 <span>Total</span>
-                <span className="text-indigo-600 text-lg">${total.toFixed(2)}</span>
+                <span className="text-indigo-600 text-lg">₹{total.toLocaleString('en-IN')}</span>
               </div>
             </div>
 

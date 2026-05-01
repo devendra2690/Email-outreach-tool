@@ -13,24 +13,20 @@ export default function Footer() {
               <div className="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center">
                 <Shirt className="w-4 h-4 text-white" />
               </div>
-              <span className="text-white font-bold text-lg">Fabric & Thread</span>
+              <span className="text-white font-bold text-lg">Pravin Fashion</span>
             </div>
             <p className="text-sm text-gray-400 leading-relaxed mb-4">
-              Your destination for premium quality garments. We offer the finest in men's, women's,
-              and children's fashion with exceptional craftsmanship.
+              Your destination for premium quality garments in Silvassa. We offer the finest in men's,
+              women's, and children's fashion with exceptional craftsmanship.
             </p>
             <div className="space-y-2 text-sm">
-              <div className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-indigo-400 flex-shrink-0" />
-                <span>hello@fabricandthread.com</span>
+              <div className="flex items-start gap-2">
+                <MapPin className="w-4 h-4 text-indigo-400 flex-shrink-0 mt-0.5" />
+                <span>Shop At Kilwani Naka, 2nd August Road, Kilvani, Silvassa-396230, Dadra And Nagar Haveli</span>
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-indigo-400 flex-shrink-0" />
-                <span>+1 (555) 012-3456</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-indigo-400 flex-shrink-0" />
-                <span>123 Fashion Ave, New York, NY 10001</span>
+                <span>+91 99671 22565</span>
               </div>
             </div>
           </div>
@@ -64,7 +60,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-gray-800 mt-10 pt-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-500">
-          <p>&copy; {new Date().getFullYear()} Fabric & Thread. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Pravin Fashion. All rights reserved.</p>
           <p>Made with ♥ for fashion lovers</p>
         </div>
       </div>

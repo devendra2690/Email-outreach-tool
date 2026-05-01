@@ -20,7 +20,7 @@ export default function Navbar() {
               <Shirt className="w-5 h-5 text-white" />
             </div>
             <div className="text-left">
-              <span className="block text-lg font-bold text-gray-900 leading-none">Fabric & Thread</span>
+              <span className="block text-lg font-bold text-gray-900 leading-none">Pravin Fashion</span>
               <span className="block text-xs text-gray-500 leading-none">Premium Garments</span>
             </div>
           </button>
