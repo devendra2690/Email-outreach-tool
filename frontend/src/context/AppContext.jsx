@@ -4,7 +4,7 @@ import { products as defaultProducts } from '../data/products'
 const AppContext = createContext(null)
 
 const STORAGE_KEY = 'pravin_fashion_products'
-const ADMIN_PASSWORD = 'pravin@2024'
+const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'pravin@2024'
 
 function loadProducts() {
   try {
